@@ -7,7 +7,7 @@
 | ▼[Editorフォルダ](https://github.com/shuhei-M/Rear_ProjectFile_2021/tree/main/Rear_MasterVersion/Assets/Editor) |  |
 | [FindReferenceAsset.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Editor/FindReferenceAsset.cs) | Editor拡張。オブジェクトの参照を確認する。オブジェクトを右クリックし、そこから「参照を探す」を選択。0個であれば、そのオブジェクトをプロジェクトファイルから削除することを検討する。 |
 | ▼[Scriptフォルダ](https://github.com/shuhei-M/Rear_ProjectFile_2021/tree/main/Rear_MasterVersion/Assets/Scripts) |  |
-| [AvatarData.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Scripts/AvatarData.cs) | DestroySmokeOrbit()関数のみ追加。PlayerControllerクラスから放物線上の投射予測線を消すためのPublic関数 |
+| [AvatarData.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Scripts/AvatarData.cs) | DestroySmokeOrbit()関数のみ追加。PlayerControllerクラスから放物線上の投射予測線を消すための関数。 |
 | [ButtonCoolTimes.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Scripts/ButtonCoolTime.cs) |  |
 | [EnemyContlloer.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Scripts/EnemyController.cs) |  |
 | [HornAvatorContlloer.cs](https://github.com/shuhei-M/Rear_ProjectFile_2021/blob/main/Rear_MasterVersion/Assets/Scripts/HornAvatarController.cs) | 移動方法・衝突検知方法を変更、死亡時赤いエミッションを放つ機能・ジャンプ機能を追加。 |
