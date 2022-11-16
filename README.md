@@ -22,6 +22,7 @@
   
   
 # 実行ファイル（.exe）の公開
+- GitHubに公開している『Rear』の実行ファイルです。   
 [『Rear』実行ファイル](https://github.com/shuhei-M/Rear_ExeFile_2021)  
   
   
@@ -76,4 +77,5 @@
   
   
 # 担当ソースコード
-[ソースコード表](CadeTable.md)
+- 私が担当したコードのGitHub内のURLと機能の概要が、表形式で羅列された.mdファイルです。  
+[担当ソースコード表](CadeTable.md)
