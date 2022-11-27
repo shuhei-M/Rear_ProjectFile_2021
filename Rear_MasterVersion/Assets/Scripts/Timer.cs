@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary> ゲームの経過時間を記録するクラス </summary>
 public class Timer : MonoBehaviour
 {
-    /// <summary> ソースを書くときのレンプレート </summary>
-
     #region define
 
     #endregion
