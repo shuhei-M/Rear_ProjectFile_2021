@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> DestroySmokeOrbit()関数のみ追加。 </summary>
+
 public class AvatarData : MonoBehaviour
 {
     //[SerializeField] float moveSpeed = 3.0f;
@@ -146,6 +148,11 @@ public class AvatarData : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 制作者：松島
+    /// ケムリスライムを射出する際の予測線を削除する。
+    /// プレイヤーが草むらに入った際に、PlayerControllerクラスから呼ぶ
+    /// </summary>
     void DestroySmokeOrbit()   //ケムリスライムの軌道を消去
     {
         for (int i = 0; i < dummyCount; i++)
@@ -185,7 +192,7 @@ public class AvatarData : MonoBehaviour
         {   // 音を鳴らしたときの処理
             noteSoundFlag = false;
             newNoteAvatar.transform.Find("SoundArea").gameObject.SendMessage("Sounding");
-            newNoteAvatar.transform.GetChild(3).gameObject.SetActive(true);
+            newNoteAvatar.transform.GetChild(3).gameObject.SetActive(true);   // (松島)波紋エフェクトを発生させる
             myAudio.clip = noteSoundAudio;
             myAudio.Play();
             Debug.Log("オンプスライムが音を鳴らしました。");

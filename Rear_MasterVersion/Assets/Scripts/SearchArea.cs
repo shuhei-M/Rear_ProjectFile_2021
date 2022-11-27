@@ -3,15 +3,29 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+/// <summary> プレイヤー・分身が、視界範囲に入ったか検知を行うクラス。 </summary>
 public class SearchArea : MonoBehaviour
 {
-    [SerializeField] SphereCollider searchArea;
-    [SerializeField] float searchAngle = 45f;
-    [SerializeField] GameObject enemy;
+    #region define
 
+    #endregion
+
+    #region serialize field
+    [SerializeField] SphereCollider searchArea;   // 自身のスフィアコライダー
+    [SerializeField] float searchAngle = 45f;   // 視野角度
+    [SerializeField] GameObject enemy;   // この視認範囲オブジェクトを持つ敵
+    #endregion
+
+    #region field
     Animator animator;
     AnimatorStateInfo stateInfo;
+    #endregion
 
+    #region property
+
+    #endregion
+
+    #region Unity function
     // Start is called before the first frame update
     void Start()
     {
@@ -24,25 +38,23 @@ public class SearchArea : MonoBehaviour
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        
-    }
-
     private void OnTriggerStay(Collider other)
     {
+        // 親である敵が死んでいたら、以降の処理は行わない。
         if (stateInfo.IsName("Die") || !PlayerController.Alive)
         {
             enemy.SendMessage("Lost");
             return;
         }
 
+        // プレイヤーが隠れ状態であれば、見過ごす。
         if(other.gameObject.tag == "Hidden")
         {
             enemy.SendMessage("Lost");
             return;
         }
 
+        // ツノスライムであれば
         if (other.gameObject.tag == "HornAvatar")
         {
             // 主人公（分身）の方向
@@ -76,6 +88,7 @@ public class SearchArea : MonoBehaviour
             }
         }
 
+        // プレイヤーであれば
         if (other.gameObject.tag == "Player" && enemy.GetComponent<EnemyController>().Avatar == null)
         {
             var eyePosition = new Vector3(
@@ -114,25 +127,27 @@ public class SearchArea : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
+        // 親である敵もしくは、プレイヤーが死んでいれば、以降の処理は行わない。
         if(stateInfo.IsName("Die") || !PlayerController.Alive)
         {
             enemy.SendMessage("Lost");
             return;
         }
 
+        // プレイヤーであれば
         if (other.gameObject.tag == "Player")
         {
             enemy.SendMessage("Lost");
             //Debug.Log("見失った02");
         }
     }
+    #endregion
 
-//#if UNITY_EDITOR
-//    //　サーチする角度表示
-//    private void OnDrawGizmos()
-//    {
-//        Handles.color = Color.blue;
-//        Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.Euler(0f, -searchAngle, 0f) * transform.forward, searchAngle * 2f, searchArea.radius);
-//    }
-//#endif
+    #region public function
+
+    #endregion
+
+    #region private function
+
+    #endregion
 }

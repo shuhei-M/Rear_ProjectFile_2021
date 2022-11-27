@@ -7,8 +7,20 @@ using UnityEngine.EventSystems;
 
 public class TitleController : MonoBehaviour
 {
+    /// <summary> ソースを書くときのレンプレート </summary>
+
+    #region define
+
+    #endregion
+
+    #region serialize field
     [SerializeField] GameObject fadeObj;
     [SerializeField] EventSystem eventSystem;
+
+    [SerializeField] GameObject SEObj;
+    #endregion
+
+    #region field
     GameObject titleBGMObj;
     GameObject selectUI;
     Image fadeImage;
@@ -16,9 +28,13 @@ public class TitleController : MonoBehaviour
     float fadeSpeed = 3f;
     float red, green, blue, alfa;
     string stageName;
+    #endregion
 
-    [SerializeField] GameObject SEObj;
+    #region property
 
+    #endregion
+
+    #region Unity function
     // Start is called before the first frame update
     void Start()
     {
@@ -72,26 +88,18 @@ public class TitleController : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region public function
     public void ClickStageSelectButton()
     {
         Invoke("StageSelectScene", 1);
-    }
-
-    void StageSelectScene()
-    {
-        SceneManager.LoadScene("StageSelect");
     }
 
     public void ClickControlButton()
     {
         Invoke("CntrolScene", 1);
         
-    }
-
-    void CntrolScene()
-    {
-        SceneManager.LoadScene("CntrolScene");
     }
 
     public void ClickQuitButton()
@@ -105,26 +113,38 @@ public class TitleController : MonoBehaviour
         Invoke("Stage01Scene", 1);
     }
 
-    void Stage01Scene()
-    {
-        stageName = "Stage01";
-    }
-
     public void ClickStage02Button()
     {
         stageSelectFalg = true;
         Invoke("Stage02Scene", 1);
     }
 
-    void Stage02Scene()
-    {
-        stageName = "Stage02";
-    }
-
     public void ClickStage03Button()
     {
         stageSelectFalg = true;
         Invoke("Stage03Scene", 1);
+    }
+    #endregion
+
+    #region private function
+    void StageSelectScene()
+    {
+        SceneManager.LoadScene("StageSelect");
+    }
+
+    void CntrolScene()
+    {
+        SceneManager.LoadScene("CntrolScene");
+    }
+
+    void Stage01Scene()
+    {
+        stageName = "Stage01";
+    }
+
+    void Stage02Scene()
+    {
+        stageName = "Stage02";
     }
 
     void Stage03Scene()
@@ -147,4 +167,5 @@ public class TitleController : MonoBehaviour
         alfa += Time.deltaTime / fadeSpeed;
         fadeImage.color = new Color(red, green, blue, alfa);
     }
+    #endregion
 }

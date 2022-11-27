@@ -4,50 +4,75 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
+/// <summary> 敵一体の挙動を管理するクラス </summary>
 public class EnemyController : MonoBehaviour
 {
+    #region define
+
+    #endregion
+
+    #region serialize field
+    /// <summary> 徘徊モード・駐在モードを切り替える。企画担当のレベルデザイン用 </summary>
+    [SerializeField] bool IsPatrolMode;
+
+    [SerializeField] float searchAngle = 120f;   // 敵に対して、プレイヤーの攻撃が当たる範囲
+
+    [SerializeField] Transform[] points;   // 徘徊モード時の、巡回するポイント
+
+    [SerializeField] float stopDistance = 1.5f;   // 攻撃を開始するプレイヤーとの距離。
+    [SerializeField] GameObject Sword;   // 敵が振るう剣。当たり判定付き。
+
+    [SerializeField] GameObject quotationMark;   // プレイヤーを見つけた際に頭上に表示する！アイコン
+
+    [SerializeField] GameObject lifeText;   // 敵の残機数を表示するテキストUI
+
+    [SerializeField] GameObject SEObj;   // SE
+    #endregion
+
+    #region field
+    /// <summary> 自身にアタッチされたコンポーネントを取得する変数群 </summary>
     NavMeshAgent agent;
     Animator animator;
     AnimatorStateInfo stateInfo;
 
-    [SerializeField] bool IsPatrolMode;
+    private int destPoint = 0;   // 現在向かうべき巡回ポイントの添え字
 
-    [SerializeField] float searchAngle = 120f;
+    GameObject searchArea;   // 視認距離を示すスフィア
 
-    [SerializeField] Transform[] points;
-    private int destPoint = 0;
+    GameObject player;   // プレイヤー
+    GameObject avatar;   // 追跡対象となる分身
+    GameObject tracked;   // 追跡対象
 
-    GameObject searchArea;
+    float stunTime = 0f;   // スタン経過時間
 
-    GameObject player;
-    GameObject avatar;
-    GameObject tracked;
-    [SerializeField] float stopDistance = 1.5f;
-    [SerializeField] GameObject Sword;
+    bool Alive;   // 生きているかどうか
 
-    [SerializeField] GameObject quotationMark;
+    const float walkSpeed = 1.5f;   // 徘徊時のスピード
+    float runSpeed = 3.0f;          // 追跡時のスピード
+    const float statusUpRatio = 0.4f;   // 敵の残機が、最初から何割になったら強化モードに移行するか
 
-    float stunTime = 0f;
+    int ollEnemyLife;   // 敵の残機
 
-    bool Alive;
-    [SerializeField] GameObject lifeText;
+    bool IsFinded;   // プレイヤーを見つけたかどうか
+    bool avatarIsFinded;   // 分身を見つけたかどうか
 
-    [SerializeField] GameObject SEObj;
+    bool isSmoked;   // 煙幕をたかれ、視界が遮られているかどうか
 
-    const float walkSpeed = 1.5f;
-    float runSpeed = 3.0f;
-    const float statusUpRatio = 0.4f;   // 敵が強化する時の総数の割合
+    bool fullEnemyCountFlag = false;   // 敵が全員生き残っているかどうか
+    bool powerUpFlag = false;   // 敵が強化モードかどうか
 
-    int ollEnemyLife;
+    float attackStateFrame = 0.0f;   // 攻撃時の経過フレーム
 
-    bool IsFinded;
-    bool avatarIsFinded;
+    bool IsStun = false;   // スタン状態かどうか
 
-    bool isSmoked;
+    /// <summary> 駐在モードが、元の場所に戻った際、向きを初期状態に戻すためのする変数群 </summary>
+    bool IsSetMoveRotation = true;
+    bool CanMoveRotation = false;
+    float step;
+    Vector3 startAngle;
+    #endregion
 
-    bool fullEnemyCountFlag = false;
-    bool powerUpFlag = false;
-
+    #region property
     public GameObject Avatar
     {
         get { return avatar; }
@@ -64,16 +89,9 @@ public class EnemyController : MonoBehaviour
         get { return isSmoked; }
         set { isSmoked = value; }
     }
+    #endregion
 
-    float attackStateFrame = 0.0f;
-
-    bool IsStun = false;
-
-    bool IsSetMoveRotation = true;
-    bool CanMoveRotation = false;
-    float step;
-    Vector3 startAngle;
-
+    #region Unity function
     // Start is called before the first frame update
     void Start()
     {
@@ -126,23 +144,65 @@ public class EnemyController : MonoBehaviour
 
         if (IsPatrolMode)
         {
+            // 徘徊モード
             PatrolMode_Update();
         }
         else
         {
+            // 駐在モード
             StayMode_Update();
         }
     }
 
-    //--- StayMode（駐在モード）用のアップデート関数 ---//
-    void StayMode_Update()
-    {   
-        if(!stateInfo.IsName("Run")) quotationMark.SetActive(false);
+    private void OnTriggerEnter(Collider other)
+    {
+        // プレイヤーから攻撃を喰らったら
+        if (other.gameObject.tag == "Head")
+        {
+            // 既に自身が死んでいれば、以下の処理は行わない。
+            if (stateInfo.IsName("Die")) return;
+
+            //　主人公の方向
+            var headDirection = other.transform.position - transform.position;
+            //　敵の前方からの主人公の方向
+            var angle = Vector3.Angle(transform.forward, headDirection);
+
+            // プレイヤーの攻撃が、有効範囲内に当たっていれば、敵は死ぬ
+            if (angle >= searchAngle)
+            {
+                Debug.Log("Hit!");
+                animator.SetTrigger("toDie");
+                SEObj.GetComponent<EnemySEScript>().DieSE();
+                Invoke("SEStop", 1.1f);
+            }
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.tag == "SmokeArea")
+        {
+            IsFinded = false;
+        }
+    }
+    #endregion
+
+    #region public function
+
+    #endregion
+
+    #region private function
+    /// <summary>
+    /// StayMode（駐在モード）用のアップデート関数
+    /// </summary>
+    private void StayMode_Update()
+    {
+        if (!stateInfo.IsName("Run")) quotationMark.SetActive(false);
 
         if (!stateInfo.IsName("Attack"))
         {
             SwordActive(false);
-            if(attackStateFrame != 0.0f)
+            if (attackStateFrame != 0.0f)
             {
                 Debug.Log(attackStateFrame);
                 attackStateFrame = 0.0f;
@@ -184,17 +244,17 @@ public class EnemyController : MonoBehaviour
         {
             agent.isStopped = true;
 
-            if(!IsSetMoveRotation)
+            if (!IsSetMoveRotation)
             {
                 transform.position = points[points.Length - 1].position;
-                var v=transform.rotation.eulerAngles;
+                var v = transform.rotation.eulerAngles;
                 var speed = Mathf.Abs(startAngle.y - v.y);
                 step = speed * Time.deltaTime / 2;   //2秒かける
                 IsSetMoveRotation = true;
                 CanMoveRotation = true;
             }
 
-            if(CanMoveRotation)
+            if (CanMoveRotation)
             {
                 //指定した方向にゆっくり回転する場合
                 transform.rotation = Quaternion.RotateTowards
@@ -255,7 +315,7 @@ public class EnemyController : MonoBehaviour
             }
         }
         //--- 帰路状態（Walkステート） ---//
-        else if(stateInfo.IsName("Walk"))
+        else if (stateInfo.IsName("Walk"))
         {
             agent.isStopped = false;
 
@@ -332,8 +392,10 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    //--- PatrolMode（巡回モード）用のアップデート関数 ---//
-    void PatrolMode_Update()
+    /// <summary>
+    /// PatrolMode（巡回モード）用のアップデート関数
+    /// </summary>
+    private void PatrolMode_Update()
     {
         if (!stateInfo.IsName("Die"))
         {
@@ -382,7 +444,7 @@ public class EnemyController : MonoBehaviour
 
             if ((avatarIsFinded || IsFinded) && !IsStun)
             {
-                if(!isSmoked || tracked.tag == "NoteAvatar")
+                if (!isSmoked || tracked.tag == "NoteAvatar")
                 {
                     animator.SetTrigger("toRun");
                     agent.speed = runSpeed;
@@ -509,7 +571,10 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    void GotoNextPoint()
+    /// <summary>
+    /// 敵を指定された場所を順繰りに徘徊させる
+    /// </summary>
+    private void GotoNextPoint()
     {
         // 地点がなにも設定されていないときに返します
         if (points.Length == 0)
@@ -523,40 +588,13 @@ public class EnemyController : MonoBehaviour
         destPoint = (destPoint + 1) % points.Length;
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Head")
-        {
-            if (!stateInfo.IsName("Die"))
-            {
-                //　主人公の方向
-                var headDirection = other.transform.position - transform.position;
-                //　敵の前方からの主人公の方向
-                var angle = Vector3.Angle(transform.forward, headDirection);
-
-                if (angle >= searchAngle)
-                {
-                    Debug.Log("Hit!");
-                    animator.SetTrigger("toDie");
-                    SEObj.GetComponent<EnemySEScript>().DieSE();
-                    Invoke("SEStop", 1.1f);
-                }
-            }
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.tag == "SmokeArea")
-        {
-            IsFinded = false;
-        }
-    }
-
+    /// <summary>
+    /// オンプスライムを切った際の、スタン状態に移行する処理
+    /// </summary>
     void Stun()
     {
         IsStun = true;
-        if(IsStun) Debug.Log("敵痺れた！");
+        if (IsStun) Debug.Log("敵痺れた！");
         //animator.SetTrigger("toStun");
         animator.SetBool("IsStun", true);
         animator.ResetTrigger("toWalk");
@@ -564,24 +602,36 @@ public class EnemyController : MonoBehaviour
         SEObj.GetComponent<EnemySEScript>().StunSE();
     }
 
-    void Find()
+    /// <summary>
+    /// 敵が追跡対象を見つけた
+    /// </summary>
+    private void Find()
     {
         IsFinded = true;
     }
 
-    void Lost()
+    /// <summary>
+    /// 敵が追跡対象を見失った
+    /// </summary>
+    private void Lost()
     {
         IsFinded = false;
     }
 
-    void SwordActive(bool flag)
+    /// <summary>
+    /// 自身の剣の与ダメ有効・無効を切り替える
+    /// 攻撃時のみ与ダメ有効にする
+    /// </summary>
+    /// <param name="flag">ON・OFF</param>
+    private void SwordActive(bool flag)
     {
         Sword.GetComponent<Collider>().enabled = flag;
         Sword.SetActive(flag);
     }
 
-    void SEStop()
+    private void SEStop()
     {
         SEObj.GetComponent<AudioSource>().Stop();
     }
+    #endregion
 }

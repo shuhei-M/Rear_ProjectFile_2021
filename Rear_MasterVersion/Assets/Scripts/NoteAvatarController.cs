@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> DeadEffect()関数のみ追加 </summary>
+
 public class NoteAvatarController : MonoBehaviour
 {
     Animator animator;
@@ -68,11 +70,7 @@ public class NoteAvatarController : MonoBehaviour
             soundArea.gameObject.SendMessage("NoSounding");
 
             //死亡時アニメーションの代替処理
-            var ps = GetComponent<ParticleSystem>();
-            var ep = new ParticleSystem.EmitParams();
-            ep.startColor = Color.red;
-            ep.startSize = 0.1f;
-            ps.Emit(ep, 1000);
+            DeadEffect();
 
             animator.SetTrigger("toDie");
             Destroy(this.gameObject, 3.0f);
@@ -85,5 +83,19 @@ public class NoteAvatarController : MonoBehaviour
     {
         // 倒しに来ていた敵全てのターゲティングをリセット
         transform.Find("SoundArea").gameObject.SendMessage("EnemyTargetReset");
+    }
+
+    /// <summary>
+    /// 制作者：松島
+    /// 敵に斬られ死亡した際に、赤いエミッションをまき散らす
+    /// </summary>
+    private void DeadEffect()
+    {
+        //死亡時アニメーションの代替処理
+        var ps = GetComponent<ParticleSystem>();
+        var ep = new ParticleSystem.EmitParams();
+        ep.startColor = Color.red;
+        ep.startSize = 0.1f;
+        ps.Emit(ep, 1000);
     }
 }

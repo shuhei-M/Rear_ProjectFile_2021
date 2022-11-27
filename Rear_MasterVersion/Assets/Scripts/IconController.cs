@@ -2,23 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> 敵がプレイヤーを発見した際に表示する！アイコンの向きを調整するクラス </summary>
 public class IconController : MonoBehaviour
 {
-    GameObject player;
-    [SerializeField] Camera myCamera;
-    //Vector3 v = new Vector3(0.0f, 1.3f, 0.0f);
+    #region define
 
+    #endregion
+
+    #region serialize field
+    [SerializeField] Camera myCamera;   // メインカメラ
+    #endregion
+
+    #region field
+    
+    #endregion
+
+    #region property
+
+    #endregion
+
+    #region Unity function
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.Find("Player");
-        //transform.position = player.transform.position + v;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        //transform.position = player.transform.position + v;
+        
     }
 
     void LateUpdate()
@@ -26,4 +39,13 @@ public class IconController : MonoBehaviour
         //　カメラと同じ向きに設定
         transform.rotation = myCamera.transform.rotation;
     }
+    #endregion
+
+    #region public function
+
+    #endregion
+
+    #region private function
+
+    #endregion
 }

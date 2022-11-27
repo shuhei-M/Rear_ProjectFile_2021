@@ -3,36 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+/// <summary> ツノスライムの挙動を管理するクラス（部分的に担当） </summary>
+/// <summary> 移動方法・衝突検知方法を変更。</summary>
+/// <summary> 死亡時赤いエミッションを放つ機能・ジャンプ機能を追加。 </summary>
 public class HornAvatarController : MonoBehaviour
 {
-    //[SerializeField] float moveSpeed = 3.0f;
-    //[SerializeField] GameObject player;
-    Vector3 GoStraight;
+    #region define
+
+    #endregion
+
+    #region serialize field
+    /// <summary> (松島)ジャンプする際のパラメータ変数群 </summary>
+    [SerializeField] float jumpSpeed = 5.0f;   // ジャンプの上方向（y軸）への初速度
+    [SerializeField] float gravity = 20.0f;   // 重力
+    [SerializeField] float jumpMagnification = 1.1f;   // ジャンプ力
+    #endregion
+
+    #region field
+    /// <summary> ↓以下、松島が追加</summary>
+    /// <summary> 自身にアタッチされたコンポーネントを取得する変数群 </summary>
+    CharacterController charaCon;
     Animator animator;
     AnimatorStateInfo stateInfo;
-    Vector3 v = Vector3.zero;
+    NavMeshAgent agent;
+
+    GameObject hornStopper;   // これが壁にぶつかった際、ツノの動きを止める
+
+    bool IsJump = false;   // ジャンプ中かどうか
+    private Vector3 moveDirection = Vector3.zero;   // ジャンプ中の上方向への動き
+
+    Vector3 GoStraight;   // ツノスライムが直進する際の向き
+
+    Vector3 v = Vector3.zero;   // 初期化用のベクトル
+    /// <summary> ↑まで、松島が追加 </summary>
+
     List<GameObject> hateEnemy;
     float deltaTime = 0f;
     float dieCountDown = 0f;
     float moveSpeed = 2.0f;
     bool stop = false;
     bool dieFlag = false;
-    NavMeshAgent agent;
+    #endregion
 
-    bool IsJump = false;
-    private Vector3 moveDirection = Vector3.zero;
-    [SerializeField] float jumpSpeed = 5.0f;
-    [SerializeField] float gravity = 20.0f;
-    [SerializeField] float jumpMagnification = 1.1f;
-    CharacterController charaCon;
-
-    GameObject hornStopper;
-
+    #region property
     public GameObject HateEnemy
     {   // 追跡してきた敵を保管
         set { hateEnemy.Add(value); }
     }
+    #endregion
 
+    #region Unity function
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -49,21 +69,19 @@ public class HornAvatarController : MonoBehaviour
 
     void Update()
     {
+        /// <summary> ↓以下、松島が追加 </summary>
         stateInfo = animator.GetCurrentAnimatorStateInfo(0);
 
         if (stop)
         {
             deltaTime = 0;
             dieCountDown += Time.deltaTime;
-            //this.GetComponent<Rigidbody>().velocity = v;
             GoStraight = v;
             agent.isStopped = true;
-            //transform.Rotate(new Vector3(0, 0, 180));
         }
         else
         {
             deltaTime += Time.deltaTime;
-            //GetComponent<Rigidbody>().velocity = transform.forward * moveSpeed;
             agent.Move(GoStraight);
         }
 
@@ -81,6 +99,7 @@ public class HornAvatarController : MonoBehaviour
         }
 
         animator.SetFloat("DeltaTime", deltaTime);
+        /// <summary> ↑まで、松島が追加 </summary>
 
         if (dieCountDown >= 1.5f)
         {
@@ -98,49 +117,6 @@ public class HornAvatarController : MonoBehaviour
         }
     }
 
-    //void OnCollisionEnter(Collision collision)
-    //{
-    //    if ((collision.gameObject.tag != "Floor") 
-    //     && (collision.gameObject.tag != "Grass")
-    //     && (collision.gameObject.tag != "JumpPoint"))
-    //    {   // 壁に当たった時の処理
-    //        Vector3 hitPos = collision.contacts[0].point;
-    //        var Direction = hitPos - transform.position;
-    //        var angle = Vector3.Angle(transform.forward, Direction);
-
-    //        if(angle <= 60f)
-    //        {
-    //            //this.GetComponent<Rigidbody>().velocity = v;
-    //            GoStraight = v;
-    //            agent.isStopped = true;
-    //            stop = true;
-    //            deltaTime = 0f;
-    //            Debug.Log("ツノ衝突");
-    //        }
-    //    }
-    //}
-
-    //private void OnCollisionStay(Collision collision)
-    //{
-    //    if (collision.gameObject.tag == "Floor")
-    //    {
-    //        for(int i = 0;i < collision.contacts.Length; i++)
-    //        {
-    //            Vector3 hitPos = collision.contacts[0].point;
-    //            var Direction = hitPos - transform.position;
-    //            var angle = Vector3.Angle(transform.forward, Direction);
-    //            if (angle <= 60f && Direction.y <= 0.5f)
-    //            {
-    //                //this.GetComponent<Rigidbody>().velocity = v;
-    //                GoStraight = v;
-    //                agent.isStopped = true;
-    //                stop = true;
-    //                deltaTime = 0f;
-    //            }
-    //        }
-    //    }
-    //}
-
     private void OnTriggerEnter(Collider other)
     {
         //// 煙の中に入ったら探知されなくなる
@@ -157,6 +133,7 @@ public class HornAvatarController : MonoBehaviour
 
             EnemyTargetReset();
 
+            /// <summary> 以下、松島が追加 </summary>
             //死亡時アニメーションの代替処理
             var ps = GetComponent<ParticleSystem>();
             var ep = new ParticleSystem.EmitParams();
@@ -173,6 +150,7 @@ public class HornAvatarController : MonoBehaviour
             agent.isStopped = true;
         }
 
+        /// <summary> (松島)段差上側のセンサーに触れた </summary>
         if (other.gameObject.tag == "JumpPoint")
         {
             Debug.Log("ツノ飛びます！");
@@ -180,14 +158,6 @@ public class HornAvatarController : MonoBehaviour
             Jump();
         }
     }
-
-    //private void OnTriggerExit(Collider other)
-    //{
-    //    if(other.gameObject.tag == "SmokeArea")
-    //    {
-    //        this.tag = "HornAvatar";
-    //    }
-    //}
 
     public void EnemyTargetReset()
     {
@@ -200,20 +170,34 @@ public class HornAvatarController : MonoBehaviour
         }
         hateEnemy.Clear();
     }
+    #endregion
 
-    void Stop()
-    {
-        Debug.Log("ツノ衝突！");
-        stop = true;
-    }
-
+    #region public function
+    /// <summary>
+    /// 制作者：松島
+    /// ツノスライムをジャンプさせる。
+    /// 段差上側に仕込まれたセンサーに触れた際に呼ばれる
+    /// </summary>
     public void Jump()
     {
         Debug.Log("Jump");
-        charaCon.enabled = true;
+        charaCon.enabled = true;   // 移動方法をキャラクターコントローラーに切り替える
         IsJump = true;
         agent.updatePosition = false;
         moveDirection.y = jumpSpeed;
         //playerSE.JumpSE();
     }
+    #endregion
+
+    #region private function
+    /// <summary>
+    /// 制作者：松島
+    /// ツノスライムが壁にぶつかり、直進を止める。
+    /// </summary>
+    private void Stop()
+    {
+        Debug.Log("ツノ衝突！");
+        stop = true;
+    }
+    #endregion
 }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary> OnCollisionEnter(Collision collision)関数、煙幕エフェクトのみ追加。 </summary>
+
 public class SmokeAvatarController : MonoBehaviour
 {
     GameObject smokeArea;
@@ -9,7 +11,7 @@ public class SmokeAvatarController : MonoBehaviour
     float deltaTime = 0;
     bool smokingFalg = false;
 
-    GameObject smokeScreen;
+    GameObject smokeScreen;   // (松島)煙幕エフェクト
 
     // Start is called before the first frame update
     void Start()
@@ -56,6 +58,12 @@ public class SmokeAvatarController : MonoBehaviour
     //    }
     //}
 
+    /// <summary>
+    /// 制作者：松島
+    /// ケムリスライムが着地した際に呼ばれる
+    /// 煙幕エフェクトを展開する
+    /// </summary>
+    /// <param name="collision"></param>
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Floor"

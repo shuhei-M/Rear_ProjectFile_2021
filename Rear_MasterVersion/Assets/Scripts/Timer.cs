@@ -5,9 +5,26 @@ using UnityEngine.UI;
 
 public class Timer : MonoBehaviour
 {
-    public static float time;
+    /// <summary> ソースを書くときのレンプレート </summary>
+
+    #region define
+
+    #endregion
+
+    #region serialize field
+
+    #endregion
+
+    #region public static
+    public static float time;   // クリアするまでのゲームの経過時間
     public static bool timeStart = false;
-    
+    #endregion
+
+    #region property
+
+    #endregion
+
+    #region Unity function
     // Start is called before the first frame update
     void Start()
     {
@@ -26,4 +43,13 @@ public class Timer : MonoBehaviour
         Text uiText = GetComponent<Text>();
         uiText.text = " : " + t;
     }
+    #endregion
+
+    #region public function
+
+    #endregion
+
+    #region private function
+
+    #endregion
 }
