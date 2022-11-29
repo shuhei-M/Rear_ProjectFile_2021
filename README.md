@@ -1,4 +1,5 @@
 # Rear_ProjectFile_2021 概要
+![Title](https://user-images.githubusercontent.com/103874162/204505626-b99819ef-164b-43c6-b3ba-043909982cfc.png)  
 - ステルスアクションゲーム『Rear』の、公開用のプロジェクトファイルです。  
 - Xboxコントローラを使用する、PC用のゲームです。  
 - 5人のチームでUnityを用い、約半年間かけて制作しました。  
